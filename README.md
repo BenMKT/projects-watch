@@ -6,39 +6,40 @@ Full-stack civic technology platform for public project monitoring, community ev
 
 - **Next.js App Router** + TypeScript + Tailwind CSS
 - **NextAuth (Auth.js)** JWT sessions with role-based access + MFA stub for admins/officers
-- **Prisma ORM** + **SQLite** (local) / **PostgreSQL** (production via Docker Compose)
+- **Prisma ORM** + **SQLite** (local) / **PostgreSQL** (production) — or **`DATA_SOURCE=mock`** JSON demo store for Vercel without a live DB
 - Modular services: RAG engine, escalation protocol, AES-256 encryption, AI sentiment/clustering mocks, offline sync
 
 ## Quick start
 
-### 1. Prerequisites
+### Demo / Vercel (no live database)
 
-- Node.js 20+
-- Optional: Docker (for PostgreSQL in production-like setups)
-
-### 2. Install & configure
+Set `DATA_SOURCE=mock` in `.env` (already the default in `.env.example`). Data is served from `data/mock-db.json`. Writes are rejected as read-only.
 
 ```bash
 npm install
-cp .env.example .env
-```
-
-By default the app uses **SQLite** (`file:./dev.db`) so you can run without Docker.
-For **PostgreSQL**: set `provider = "postgresql"` in `prisma/schema.prisma`, point `DATABASE_URL` at Postgres, then `docker compose up -d` (see `docker-compose.yml`).
-
-### 3. Database setup & seed
-
-```bash
-npm run db:setup
-```
-
-### 4. Run the app
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+On Vercel, set environment variables:
+
+- `DATA_SOURCE=mock`
+- `AUTH_SECRET` (generate with `npx auth secret`)
+- `AUTH_URL` / `NEXTAUTH_URL` = your deployment URL
+- `ENCRYPTION_KEY`, `ANONYMISATION_SALT` (any long secrets)
+
+No `DATABASE_URL` required for mock mode.
+
+### Local with Prisma / SQLite
+
+```bash
+# .env → DATA_SOURCE=prisma
+npm install
+npm run db:setup
+npm run dev
+```
+
+By default the Prisma path uses **SQLite** (`file:./dev.db`).
+For **PostgreSQL**: set `provider = "postgresql"` in `prisma/schema.prisma`, point `DATABASE_URL` at Postgres, then `docker compose up -d` (see `docker-compose.yml`).
 
 ## Demo accounts
 
@@ -72,7 +73,7 @@ MFA code (admins / officers / parliamentary): `123456`
 
 - Geo clusters / heatmaps (mock services)
 - Public dashboard: RAG map, feed, scorecards, ministry tracker
-- Escalation: Green info · Amber 14-day · Red 5-day + ACA + public statement + parliamentary committee
+- Escalation: Green info · Amber 14-day · Red 5-day + IGG + public statement + parliamentary committee
 
 ### Security
 

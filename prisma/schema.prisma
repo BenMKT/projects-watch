@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  // Local default: SQLite. For production PostgreSQL, set provider = "postgresql"
+  // and DATABASE_URL to your Postgres connection (see docker-compose.yml).
+  provider = "sqlite"
+  // url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  DISTRICT_ADMIN
+  FIELD_OFFICER
+  CITIZEN
+  CONTRACTOR
+  PARLIAMENTARY
+}
+
+enum RagStatus {
+  GREEN
+  AMBER
+  RED
+  PENDING
+}
+
+enum ReportType {
+  PHOTO
+  VIDEO
+  WRITTEN
+  VOICE
+  STRUCTURED
+}
+
+enum SentimentLabel {
+  POSITIVE
+  NEGATIVE
+  NEUTRAL
+}
+
+enum SurveyDomain {
+  INFRASTRUCTURE
+  HEALTHCARE
+  EDUCATION
+  EMPLOYMENT
+  SECURITY
+}
+
+enum SurveyStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  PUBLISHED
+}
+
+enum EscalationLevel {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum EscalationStatus {
+  OPEN
+  ACKNOWLEDGED
+  IN_PROGRESS
+  RESOLVED
+  OVERDUE
+}
+
+enum MinistryActionStatus {
+  PENDING
+  ACKNOWLEDGED
+  ACTIONED
+  CLOSED
+}
+
+model User {
+  id                 String    @id @default(cuid())
+  email              String    @unique
+  name               String
+  passwordHash       String
+  role               Role      @default(CITIZEN)
+  district           String?
+  mfaEnabled         Boolean   @default(false)
+  mfaSecret          String?
+  anonymisedId       String?   @unique
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  projectsCreated    Project[] @relation("ProjectCreator")
+  reports            CitizenReport[]
+  subscriptions      ProjectSubscription[]
+  surveysConducted   SurveyResponse[]
+  surveysApproved    Survey[]  @relation("SurveyApprover")
+  audits             AuditLog[]
+  escalationsHandled Escalation[] @relation("EscalationHandler")
+  ministryActions    MinistryResponse[]
+}
+
+model Project {
+  id              String       @id @default(cuid())
+  projectCode     String       @unique
+  name            String
+  contractor      String
+  contractSum     Float
+  durationMonths  Int
+  scope           String
+  district        String
+  sector          String
+  latitude        Float
+  longitude       Float
+  baselinePhotos  Json         @default("[]")
+  provisionalRag  RagStatus    @default(PENDING)
+  finalRag        RagStatus    @default(PENDING)
+  statusPublished Boolean      @default(false)
+  startDate       DateTime
+  endDate         DateTime?
+  createdById     String
+  createdBy       User         @relation("ProjectCreator", fields: [createdById], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  milestones      Milestone[]
+  reports         CitizenReport[]
+  subscriptions   ProjectSubscription[]
+  escalations     Escalation[]
+  ministryResponses MinistryResponse[]
+  performanceLogs ContractorPerformance[]
+}
+
+model Milestone {
+  id          String   @id @default(cuid())
+  projectId   String
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  dueDate     DateTime
+  completed   Boolean  @default(false)
+  orderIndex  Int
+  reports     CitizenReport[]
+}
+
+model CitizenReport {
+  id                String         @id @default(cuid())
+  projectId         String
+  project           Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestoneId       String?
+  milestone         Milestone?     @relation(fields: [milestoneId], references: [id])
+  reporterId        String?
+  reporter          User?          @relation(fields: [reporterId], references: [id])
+  anonymisedReporter String
+  type              ReportType
+  content           String?
+  encryptedPayload  String?
+  mediaUrls         Json           @default("[]")
+  latitude          Float?
+  longitude         Float?
+  photoMetadata     Json?
+  sentiment         SentimentLabel?
+  sentimentScore    Float?
+  activityScore     Float?
+  weight            Float          @default(1.0)
+  isAnonymous       Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model ProjectSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, projectId])
+}
+
+model Survey {
+  id           String         @id @default(cuid())
+  title        String
+  domain       SurveyDomain
+  district     String
+  description  String
+  status       SurveyStatus   @default(DRAFT)
+  questions    Json
+  approvedById String?
+  approvedBy   User?          @relation("SurveyApprover", fields: [approvedById], references: [id])
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  responses    SurveyResponse[]
+}
+
+model SurveyResponse {
+  id               String   @id @default(cuid())
+  surveyId         String
+  survey           Survey   @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  officerId        String
+  officer          User     @relation(fields: [officerId], references: [id])
+  householdCode    String
+  answers          Json
+  latitude         Float?
+  longitude        Float?
+  photoCache       Json      @default("[]")
+  encryptedDraft   String?
+  isOfflineDraft   Boolean  @default(false)
+  syncedAt         DateTime?
+  conflictResolved Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Escalation {
+  id              String            @id @default(cuid())
+  projectId       String
+  project         Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  level           EscalationLevel
+  ragTrigger      RagStatus
+  status          EscalationStatus  @default(OPEN)
+  deadline        DateTime
+  recipients      Json
+  publicStatement String?
+  notifiedBodies  Json
+  handlerId       String?
+  handler         User?             @relation("EscalationHandler", fields: [handlerId], references: [id])
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  responses       MinistryResponse[]
+}
+
+model MinistryResponse {
+  id           String               @id @default(cuid())
+  projectId    String
+  project      Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  escalationId String?
+  escalation   Escalation?          @relation(fields: [escalationId], references: [id])
+  actorId      String
+  actor        User                 @relation(fields: [actorId], references: [id])
+  status       MinistryActionStatus @default(PENDING)
+  acknowledgement String?
+  actionTaken  String?
+  acknowledgedAt DateTime?
+  actionedAt   DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model ContractorPerformance {
+  id            String   @id @default(cuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contractor    String
+  score         Float
+  onTimeRate    Float
+  qualityScore  Float
+  ragHistory    Json
+  notes         String?
+  recordedAt    DateTime @default(now())
+}
+
+model DevelopmentScorecard {
+  id            String   @id @default(cuid())
+  district      String
+  sector        String
+  month         Int
+  year          Int
+  ragScore      Float
+  sentimentAvg  Float
+  needIndex     Float
+  reportCount   Int
+  trends        Json?
+  createdAt     DateTime @default(now())
+
+  @@unique([district, sector, month, year])
+}
+
+model MonthlyReport {
+  id          String   @id @default(cuid())
+  title       String
+  month       Int
+  year        Int
+  summary     String
+  gaps        Json
+  heatmapData Json
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String
+  entity     String
+  entityId   String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+}
+
+model DataRetentionPolicy {
+  id            String   @id @default(cuid())
+  entityType    String   @unique
+  retentionDays Int
+  anonymiseAfter Int?
+  description   String
+  updatedAt     DateTime @updatedAt
+}
