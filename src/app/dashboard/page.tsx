@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
 import { RagBadge } from "@/components/RagBadge";
+import { DashboardCharts } from "@/components/DashboardCharts";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 
@@ -29,7 +30,7 @@ export default function DashboardPage() {
         Public development dashboard
       </h1>
       <p className="mt-1 text-sm text-teal-800/70">
-        RAG map · community feed · district scorecards · ministry response tracker
+        RAG map · district bars · sector stacks · scorecards · ministry tracker
       </p>
 
       <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -87,6 +88,8 @@ export default function DashboardPage() {
           </ul>
         </div>
       </div>
+
+      <DashboardCharts projects={projects || []} scorecards={scorecards || []} />
 
       <section className="mt-12">
         <h2 className="font-[family-name:var(--font-display)] text-xl text-teal-950">

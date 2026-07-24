@@ -50,6 +50,16 @@ body {
   animation: rise 0.7s ease-out 0.15s both;
 }
 
+@keyframes bar-fill {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.chart-bar-fill {
+  transform-origin: left center;
+  animation: bar-fill 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .leaflet-container {
   font-family: inherit;
 }
