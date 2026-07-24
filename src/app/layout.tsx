@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Fraunces, Source_Sans_3 } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { Providers } from '@/components/Providers';
 import { SiteHeader } from '@/components/SiteHeader';
@@ -45,6 +46,7 @@ export default function RootLayout({
             </div>
           </footer>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
