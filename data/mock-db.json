@@ -1,0 +1,274 @@
+{
+  "users": [
+    {
+      "id": "user_superadmin",
+      "email": "superadmin@cdw.local",
+      "name": "Ministry Super Admin",
+      "password": "password123",
+      "role": "SUPER_ADMIN",
+      "district": "Kampala",
+      "mfaEnabled": true,
+      "mfaSecret": "123456",
+      "anonymisedId": "anon_superadmin01",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "user_district",
+      "email": "district@cdw.local",
+      "name": "Kampala District Admin",
+      "password": "password123",
+      "role": "DISTRICT_ADMIN",
+      "district": "Kampala",
+      "mfaEnabled": true,
+      "mfaSecret": "123456",
+      "anonymisedId": "anon_district001",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "user_officer",
+      "email": "officer@cdw.local",
+      "name": "Amina Field Officer",
+      "password": "password123",
+      "role": "FIELD_OFFICER",
+      "district": "Kampala",
+      "mfaEnabled": true,
+      "mfaSecret": "123456",
+      "anonymisedId": "anon_officer0001",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "user_citizen",
+      "email": "citizen@cdw.local",
+      "name": "Joseph Citizen",
+      "password": "password123",
+      "role": "CITIZEN",
+      "district": "Kampala",
+      "mfaEnabled": false,
+      "mfaSecret": null,
+      "anonymisedId": "anon_citizen0001",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "user_parliament",
+      "email": "parliament@cdw.local",
+      "name": "Parliamentary Oversight",
+      "password": "password123",
+      "role": "PARLIAMENTARY",
+      "district": null,
+      "mfaEnabled": true,
+      "mfaSecret": "123456",
+      "anonymisedId": "anon_parliament01",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    }
+  ],
+  "projects": [
+    {
+      "id": "proj_kla_001",
+      "projectCode": "CDW-KLA-001",
+      "name": "Northern Bypass Dual Carriageway Phase II",
+      "contractor": "Nile Bridge Civil Ltd",
+      "contractSum": 420000000000,
+      "durationMonths": 24,
+      "scope": "Dual carriageway expansion, drainage, pedestrian walkways and street lighting along Kampala Northern Bypass.",
+      "district": "Kampala",
+      "sector": "Infrastructure",
+      "latitude": 0.3721,
+      "longitude": 32.5589,
+      "baselinePhotos": ["baseline-1.jpg", "baseline-2.jpg"],
+      "provisionalRag": "AMBER",
+      "finalRag": "AMBER",
+      "statusPublished": true,
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2026-06-01T00:00:00.000Z",
+      "createdById": "user_superadmin",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "proj_gul_014",
+      "projectCode": "CDW-GUL-014",
+      "name": "Gulu Community Water Kiosk Network",
+      "contractor": "Acholi Water Works Co.",
+      "contractSum": 18000000000,
+      "durationMonths": 12,
+      "scope": "Construction of 40 community water kiosks with solar pumping in peri-urban Gulu.",
+      "district": "Gulu",
+      "sector": "Water",
+      "latitude": 2.7746,
+      "longitude": 32.299,
+      "baselinePhotos": ["baseline-1.jpg"],
+      "provisionalRag": "GREEN",
+      "finalRag": "GREEN",
+      "statusPublished": true,
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2025-06-01T00:00:00.000Z",
+      "createdById": "user_superadmin",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2025-02-01T00:00:00.000Z"
+    },
+    {
+      "id": "proj_jin_008",
+      "projectCode": "CDW-JIN-008",
+      "name": "Jinja Community Health Centre Upgrade",
+      "contractor": "Source of the Nile Builders",
+      "contractSum": 31000000000,
+      "durationMonths": 18,
+      "scope": "Maternity ward expansion, drug store renovation, and solar backup for Jinja CHC.",
+      "district": "Jinja",
+      "sector": "Healthcare",
+      "latitude": 0.4244,
+      "longitude": 33.2041,
+      "baselinePhotos": ["baseline-1.jpg"],
+      "provisionalRag": "RED",
+      "finalRag": "RED",
+      "statusPublished": true,
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2026-01-01T00:00:00.000Z",
+      "createdById": "user_superadmin",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2025-03-01T00:00:00.000Z"
+    },
+    {
+      "id": "proj_mba_021",
+      "projectCode": "CDW-MBA-021",
+      "name": "Mbale Youth Polytechnic Workshop",
+      "contractor": "Elgon Craft Contractors",
+      "contractSum": 9500000000,
+      "durationMonths": 10,
+      "scope": "New workshops for welding, carpentry and ICT training with accessibility upgrades.",
+      "district": "Mbale",
+      "sector": "Education",
+      "latitude": 1.082,
+      "longitude": 34.175,
+      "baselinePhotos": [],
+      "provisionalRag": "PENDING",
+      "finalRag": "PENDING",
+      "statusPublished": false,
+      "startDate": "2024-06-01T00:00:00.000Z",
+      "endDate": "2025-04-01T00:00:00.000Z",
+      "createdById": "user_superadmin",
+      "createdAt": "2024-06-01T00:00:00.000Z",
+      "updatedAt": "2024-06-01T00:00:00.000Z"
+    }
+  ],
+  "milestones": [
+    { "id": "ms_kla_1", "projectId": "proj_kla_001", "title": "Site mobilisation", "description": "Contractor mobilisation and site handover", "dueDate": "2024-08-01T00:00:00.000Z", "completed": true, "orderIndex": 1 },
+    { "id": "ms_kla_2", "projectId": "proj_kla_001", "title": "Structural / core works", "description": "Primary construction milestone", "dueDate": "2025-06-01T00:00:00.000Z", "completed": false, "orderIndex": 2 },
+    { "id": "ms_kla_3", "projectId": "proj_kla_001", "title": "Commissioning & handover", "description": "Final inspection and community handover", "dueDate": "2026-01-01T00:00:00.000Z", "completed": false, "orderIndex": 3 },
+    { "id": "ms_gul_1", "projectId": "proj_gul_014", "title": "Site mobilisation", "description": "Contractor mobilisation and site handover", "dueDate": "2024-08-01T00:00:00.000Z", "completed": true, "orderIndex": 1 },
+    { "id": "ms_gul_2", "projectId": "proj_gul_014", "title": "Structural / core works", "description": "Primary construction milestone", "dueDate": "2025-06-01T00:00:00.000Z", "completed": true, "orderIndex": 2 },
+    { "id": "ms_gul_3", "projectId": "proj_gul_014", "title": "Commissioning & handover", "description": "Final inspection and community handover", "dueDate": "2026-01-01T00:00:00.000Z", "completed": false, "orderIndex": 3 },
+    { "id": "ms_jin_1", "projectId": "proj_jin_008", "title": "Site mobilisation", "description": "Contractor mobilisation and site handover", "dueDate": "2024-08-01T00:00:00.000Z", "completed": true, "orderIndex": 1 },
+    { "id": "ms_jin_2", "projectId": "proj_jin_008", "title": "Structural / core works", "description": "Primary construction milestone", "dueDate": "2025-06-01T00:00:00.000Z", "completed": false, "orderIndex": 2 },
+    { "id": "ms_jin_3", "projectId": "proj_jin_008", "title": "Commissioning & handover", "description": "Final inspection and community handover", "dueDate": "2026-01-01T00:00:00.000Z", "completed": false, "orderIndex": 3 },
+    { "id": "ms_mba_1", "projectId": "proj_mba_021", "title": "Site mobilisation", "description": "Contractor mobilisation and site handover", "dueDate": "2024-08-01T00:00:00.000Z", "completed": false, "orderIndex": 1 },
+    { "id": "ms_mba_2", "projectId": "proj_mba_021", "title": "Structural / core works", "description": "Primary construction milestone", "dueDate": "2025-06-01T00:00:00.000Z", "completed": false, "orderIndex": 2 },
+    { "id": "ms_mba_3", "projectId": "proj_mba_021", "title": "Commissioning & handover", "description": "Final inspection and community handover", "dueDate": "2026-01-01T00:00:00.000Z", "completed": false, "orderIndex": 3 }
+  ],
+  "reports": [
+    { "id": "rep_1", "projectId": "proj_kla_001", "milestoneId": "ms_kla_2", "reporterId": null, "anonymisedReporter": "anon_rep_kla_01", "type": "WRITTEN", "content": "Work is active but slow. Drainage incomplete near junction.", "encryptedPayload": null, "mediaUrls": [], "latitude": 0.373, "longitude": 32.56, "photoMetadata": null, "sentiment": "NEUTRAL", "sentimentScore": 0.45, "activityScore": 0.55, "weight": 1, "isAnonymous": true, "createdAt": "2025-01-10T10:00:00.000Z", "updatedAt": "2025-01-10T10:00:00.000Z" },
+    { "id": "rep_2", "projectId": "proj_kla_001", "milestoneId": "ms_kla_2", "reporterId": null, "anonymisedReporter": "anon_rep_kla_02", "type": "PHOTO", "content": "Delay on pedestrian walkways. Materials missing for two weeks.", "encryptedPayload": null, "mediaUrls": ["evidence.jpg"], "latitude": 0.371, "longitude": 32.557, "photoMetadata": null, "sentiment": "NEGATIVE", "sentimentScore": 0.25, "activityScore": 0.35, "weight": 1, "isAnonymous": true, "createdAt": "2025-01-12T10:00:00.000Z", "updatedAt": "2025-01-12T10:00:00.000Z" },
+    { "id": "rep_3", "projectId": "proj_kla_001", "milestoneId": "ms_kla_2", "reporterId": null, "anonymisedReporter": "anon_rep_kla_03", "type": "VOICE", "content": "Some progress on lighting poles this week. Still behind schedule.", "encryptedPayload": null, "mediaUrls": [], "latitude": 0.374, "longitude": 32.559, "photoMetadata": null, "sentiment": "NEUTRAL", "sentimentScore": 0.5, "activityScore": 0.6, "weight": 1.2, "isAnonymous": true, "createdAt": "2025-01-14T10:00:00.000Z", "updatedAt": "2025-01-14T10:00:00.000Z" },
+    { "id": "rep_4", "projectId": "proj_gul_014", "milestoneId": "ms_gul_2", "reporterId": null, "anonymisedReporter": "anon_rep_gul_01", "type": "STRUCTURED", "content": "Excellent progress. Three kiosks completed and working with good water quality.", "encryptedPayload": null, "mediaUrls": [], "latitude": 2.775, "longitude": 32.3, "photoMetadata": null, "sentiment": "POSITIVE", "sentimentScore": 0.9, "activityScore": 0.85, "weight": 1.2, "isAnonymous": true, "createdAt": "2025-02-01T10:00:00.000Z", "updatedAt": "2025-02-01T10:00:00.000Z" },
+    { "id": "rep_5", "projectId": "proj_gul_014", "milestoneId": "ms_gul_2", "reporterId": null, "anonymisedReporter": "anon_rep_gul_02", "type": "WRITTEN", "content": "Community satisfied. Solar pumps active and reliable.", "encryptedPayload": null, "mediaUrls": [], "latitude": 2.773, "longitude": 32.298, "photoMetadata": null, "sentiment": "POSITIVE", "sentimentScore": 0.85, "activityScore": 0.8, "weight": 1, "isAnonymous": true, "createdAt": "2025-02-02T10:00:00.000Z", "updatedAt": "2025-02-02T10:00:00.000Z" },
+    { "id": "rep_6", "projectId": "proj_gul_014", "milestoneId": "ms_gul_2", "reporterId": null, "anonymisedReporter": "anon_rep_gul_03", "type": "PHOTO", "content": "On track for remaining kiosks. Contractor delivering quality work.", "encryptedPayload": null, "mediaUrls": ["evidence.jpg"], "latitude": 2.776, "longitude": 32.301, "photoMetadata": null, "sentiment": "POSITIVE", "sentimentScore": 0.88, "activityScore": 0.82, "weight": 1, "isAnonymous": true, "createdAt": "2025-02-03T10:00:00.000Z", "updatedAt": "2025-02-03T10:00:00.000Z" },
+    { "id": "rep_7", "projectId": "proj_jin_008", "milestoneId": "ms_jin_2", "reporterId": null, "anonymisedReporter": "anon_rep_jin_01", "type": "PHOTO", "content": "Site abandoned. No workers for a month. Materials appear stolen.", "encryptedPayload": null, "mediaUrls": ["evidence.jpg"], "latitude": 0.425, "longitude": 33.205, "photoMetadata": null, "sentiment": "NEGATIVE", "sentimentScore": 0.1, "activityScore": 0.15, "weight": 1, "isAnonymous": true, "createdAt": "2025-03-01T10:00:00.000Z", "updatedAt": "2025-03-01T10:00:00.000Z" },
+    { "id": "rep_8", "projectId": "proj_jin_008", "milestoneId": "ms_jin_2", "reporterId": null, "anonymisedReporter": "anon_rep_jin_02", "type": "VOICE", "content": "Maternity ward incomplete and stalled. Community very concerned about corruption.", "encryptedPayload": null, "mediaUrls": [], "latitude": 0.423, "longitude": 33.203, "photoMetadata": null, "sentiment": "NEGATIVE", "sentimentScore": 0.12, "activityScore": 0.2, "weight": 1.2, "isAnonymous": true, "createdAt": "2025-03-02T10:00:00.000Z", "updatedAt": "2025-03-02T10:00:00.000Z" },
+    { "id": "rep_9", "projectId": "proj_jin_008", "milestoneId": "ms_jin_2", "reporterId": null, "anonymisedReporter": "anon_rep_jin_03", "type": "WRITTEN", "content": "Failed delivery. Fence broken, works stopped, unsafe for patients.", "encryptedPayload": null, "mediaUrls": [], "latitude": 0.424, "longitude": 33.204, "photoMetadata": null, "sentiment": "NEGATIVE", "sentimentScore": 0.15, "activityScore": 0.18, "weight": 1, "isAnonymous": true, "createdAt": "2025-03-03T10:00:00.000Z", "updatedAt": "2025-03-03T10:00:00.000Z" }
+  ],
+  "subscriptions": [
+    { "id": "sub_1", "userId": "user_citizen", "projectId": "proj_kla_001", "createdAt": "2025-01-05T00:00:00.000Z" }
+  ],
+  "surveys": [
+    { "id": "survey_infra", "title": "Infrastructure Assessment", "domain": "INFRASTRUCTURE", "district": "Kampala", "description": "Roads, water, waste management, and electricity access.", "status": "APPROVED", "questions": [{ "id": "road_condition", "prompt": "How would you rate the condition of local roads?", "type": "scale", "required": true }, { "id": "water_access", "prompt": "Does the household have reliable clean water?", "type": "boolean", "required": true }, { "id": "waste_collection", "prompt": "How often is waste collected?", "type": "select", "options": ["Daily", "Weekly", "Rarely", "Never"], "required": true }, { "id": "electricity", "prompt": "Electricity reliability this month", "type": "scale", "required": true }, { "id": "notes", "prompt": "Additional infrastructure observations", "type": "text" }], "approvedById": "user_superadmin", "createdAt": "2024-07-01T00:00:00.000Z", "updatedAt": "2024-07-01T00:00:00.000Z" },
+    { "id": "survey_health", "title": "Healthcare Access Survey", "domain": "HEALTHCARE", "district": "Kampala", "description": "Facility distance, drugs, staffing, maternal and child services.", "status": "APPROVED", "questions": [{ "id": "facility_distance", "prompt": "Distance to nearest health facility (km)", "type": "select", "options": ["<1", "1-5", "5-10", ">10"], "required": true }, { "id": "drug_availability", "prompt": "Were essential medicines available on last visit?", "type": "boolean", "required": true }, { "id": "staffing", "prompt": "Were clinical staff present?", "type": "boolean", "required": true }, { "id": "maternal_services", "prompt": "Quality of maternal/child services", "type": "scale", "required": true }, { "id": "notes", "prompt": "Healthcare observations", "type": "text" }], "approvedById": "user_superadmin", "createdAt": "2024-07-01T00:00:00.000Z", "updatedAt": "2024-07-01T00:00:00.000Z" },
+    { "id": "survey_edu", "title": "Education Quality Survey", "domain": "EDUCATION", "district": "Kampala", "description": "School condition, teacher attendance, learning materials.", "status": "PUBLISHED", "questions": [], "approvedById": "user_superadmin", "createdAt": "2024-07-01T00:00:00.000Z", "updatedAt": "2024-07-01T00:00:00.000Z" },
+    { "id": "survey_emp", "title": "Employment & Livelihoods", "domain": "EMPLOYMENT", "district": "Kampala", "description": "Income sources, government support, youth employment.", "status": "PUBLISHED", "questions": [], "approvedById": "user_superadmin", "createdAt": "2024-07-01T00:00:00.000Z", "updatedAt": "2024-07-01T00:00:00.000Z" },
+    { "id": "survey_sec", "title": "Community Security Perception", "domain": "SECURITY", "district": "Kampala", "description": "Safety perception, incident frequency, police presence.", "status": "PUBLISHED", "questions": [], "approvedById": "user_superadmin", "createdAt": "2024-07-01T00:00:00.000Z", "updatedAt": "2024-07-01T00:00:00.000Z" }
+  ],
+  "surveyResponses": [
+    {
+      "id": "sresp_1",
+      "surveyId": "survey_infra",
+      "officerId": "user_officer",
+      "householdCode": "HH-KLA-001",
+      "answers": { "road_condition": 3, "water_access": true, "waste_collection": "Weekly", "electricity": 4, "notes": "Mixed infrastructure quality in Kampala parish" },
+      "latitude": 0.3476,
+      "longitude": 32.5825,
+      "photoCache": [],
+      "encryptedDraft": null,
+      "isOfflineDraft": false,
+      "syncedAt": "2025-01-20T00:00:00.000Z",
+      "conflictResolved": false,
+      "createdAt": "2025-01-20T00:00:00.000Z",
+      "updatedAt": "2025-01-20T00:00:00.000Z"
+    }
+  ],
+  "escalations": [
+    {
+      "id": "esc_jin_red",
+      "projectId": "proj_jin_008",
+      "level": "CRITICAL",
+      "ragTrigger": "RED",
+      "status": "OPEN",
+      "deadline": "2025-03-08T00:00:00.000Z",
+      "recipients": ["minister@works.go.ug", "ps@works.go.ug", "igg@igg.go.ug", "pac@parliament.go.ug"],
+      "publicStatement": "Public notice: Project CDW-JIN-008 (Jinja Community Health Centre Upgrade) classified RED — stalled/abandoned. Authorities notified with 5-day response deadline.",
+      "notifiedBodies": ["Line Minister", "Permanent Secretary", "Inspectorate of Government (IGG)", "Parliamentary Committee"],
+      "handlerId": "user_superadmin",
+      "createdAt": "2025-03-03T12:00:00.000Z",
+      "updatedAt": "2025-03-03T12:00:00.000Z"
+    },
+    {
+      "id": "esc_kla_amber",
+      "projectId": "proj_kla_001",
+      "level": "WARNING",
+      "ragTrigger": "AMBER",
+      "status": "ACKNOWLEDGED",
+      "deadline": "2025-01-29T00:00:00.000Z",
+      "recipients": ["project.officer@works.go.ug", "district.desk@works.go.ug"],
+      "publicStatement": null,
+      "notifiedBodies": ["Project Officer", "Ministry Desk"],
+      "handlerId": "user_superadmin",
+      "createdAt": "2025-01-15T00:00:00.000Z",
+      "updatedAt": "2025-01-16T00:00:00.000Z"
+    }
+  ],
+  "ministryResponses": [
+    {
+      "id": "mr_1",
+      "projectId": "proj_jin_008",
+      "escalationId": "esc_jin_red",
+      "actorId": "user_superadmin",
+      "status": "PENDING",
+      "acknowledgement": "Critical escalation opened pending ministerial acknowledgement",
+      "actionTaken": null,
+      "acknowledgedAt": null,
+      "actionedAt": null,
+      "createdAt": "2025-03-03T12:05:00.000Z",
+      "updatedAt": "2025-03-03T12:05:00.000Z"
+    }
+  ],
+  "performanceLogs": [
+    { "id": "perf_1", "projectId": "proj_kla_001", "contractor": "Nile Bridge Civil Ltd", "score": 62, "onTimeRate": 0.55, "qualityScore": 0.7, "ragHistory": [{ "at": "2025-01", "rag": "AMBER" }], "notes": "Behind on walkways along Northern Bypass", "recordedAt": "2025-01-15T00:00:00.000Z" },
+    { "id": "perf_2", "projectId": "proj_jin_008", "contractor": "Source of the Nile Builders", "score": 28, "onTimeRate": 0.2, "qualityScore": 0.35, "ragHistory": [{ "at": "2025-01", "rag": "RED" }], "notes": "Site inactive — under review", "recordedAt": "2025-03-01T00:00:00.000Z" }
+  ],
+  "scorecards": [
+    { "id": "sc_1", "district": "Kampala", "sector": "Infrastructure", "month": 7, "year": 2026, "ragScore": 0.55, "sentimentAvg": 0.48, "needIndex": 0.52, "reportCount": 3, "trends": [{ "month": "prev", "needIndex": 0.48 }], "createdAt": "2026-07-01T00:00:00.000Z" },
+    { "id": "sc_2", "district": "Jinja", "sector": "Healthcare", "month": 7, "year": 2026, "ragScore": 0.15, "sentimentAvg": 0.12, "needIndex": 0.82, "reportCount": 3, "trends": [{ "month": "prev", "needIndex": 0.7 }], "createdAt": "2026-07-01T00:00:00.000Z" },
+    { "id": "sc_3", "district": "Gulu", "sector": "Water", "month": 7, "year": 2026, "ragScore": 0.92, "sentimentAvg": 0.88, "needIndex": 0.18, "reportCount": 3, "trends": [{ "month": "prev", "needIndex": 0.25 }], "createdAt": "2026-07-01T00:00:00.000Z" }
+  ],
+  "auditLogs": [
+    { "id": "audit_1", "userId": "user_superadmin", "action": "SEED_COMPLETED", "entity": "System", "entityId": null, "metadata": { "mode": "mock" }, "ipAddress": null, "createdAt": "2024-06-01T00:00:00.000Z" }
+  ],
+  "retentionPolicies": [
+    { "id": "ret_1", "entityType": "CitizenReport", "retentionDays": 2555, "anonymiseAfter": 365, "description": "Citizen evidence retained 7 years; reporter linkage anonymised after 1 year.", "updatedAt": "2024-06-01T00:00:00.000Z" },
+    { "id": "ret_2", "entityType": "SurveyResponse", "retentionDays": 1825, "anonymiseAfter": 730, "description": "Household survey raw data restricted; anonymise household codes after 2 years.", "updatedAt": "2024-06-01T00:00:00.000Z" },
+    { "id": "ret_3", "entityType": "AuditLog", "retentionDays": 3650, "anonymiseAfter": null, "description": "Immutable audit trail retained 10 years for parliamentary/audit access.", "updatedAt": "2024-06-01T00:00:00.000Z" }
+  ]
+}
