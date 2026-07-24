@@ -41,11 +41,11 @@ function asDate(value: unknown): Date {
 }
 
 function hydrateDates<T extends Dict>(row: T, fields: string[]): T {
-  const next = { ...row };
+  const next: Dict = { ...row };
   for (const f of fields) {
     if (next[f] != null) next[f] = asDate(next[f]);
   }
-  return next;
+  return next as T;
 }
 
 function matchWhere(row: Dict, where?: Dict): boolean {
@@ -123,7 +123,7 @@ function enrichProject(project: Dict, args?: { include?: Dict; select?: Dict }) 
   }
   if (include.reports) {
     const conf = include.reports as Dict;
-    let reports = s.reports
+    let reports: Dict[] = s.reports
       .filter((r) => r.projectId === id)
       .map((r) => hydrateDates(r, ["createdAt", "updatedAt"]));
     reports = sortRows(reports, (conf.orderBy as Dict) ?? { createdAt: "desc" });
@@ -135,7 +135,7 @@ function enrichProject(project: Dict, args?: { include?: Dict; select?: Dict }) 
   }
   if (include.escalations) {
     const conf = include.escalations as Dict;
-    let items = s.escalations
+    let items: Dict[] = s.escalations
       .filter((e) => e.projectId === id)
       .map((e) => hydrateDates(e, ["deadline", "createdAt", "updatedAt"]));
     items = sortRows(items, (conf.orderBy as Dict) ?? { createdAt: "desc" });
@@ -144,7 +144,7 @@ function enrichProject(project: Dict, args?: { include?: Dict; select?: Dict }) 
   }
   if (include.ministryResponses) {
     const conf = include.ministryResponses as Dict;
-    let items = s.ministryResponses
+    let items: Dict[] = s.ministryResponses
       .filter((m) => m.projectId === id)
       .map((m) => hydrateDates(m, ["createdAt", "updatedAt", "acknowledgedAt", "actionedAt"]));
     items = sortRows(items, (conf.orderBy as Dict) ?? { createdAt: "desc" });
@@ -153,7 +153,7 @@ function enrichProject(project: Dict, args?: { include?: Dict; select?: Dict }) 
   }
   if (include.performanceLogs) {
     const conf = include.performanceLogs as Dict;
-    let items = s.performanceLogs
+    let items: Dict[] = s.performanceLogs
       .filter((p) => p.projectId === id)
       .map((p) => hydrateDates(p, ["recordedAt"]));
     items = sortRows(items, (conf.orderBy as Dict) ?? { recordedAt: "desc" });
@@ -189,7 +189,7 @@ function model(name: keyof MockStore) {
 
       if (name === "reports" || name === "citizenReport" as never) {
         return rows.map((r) => {
-          let out = hydrateDates(r, ["createdAt", "updatedAt"]);
+          const out = hydrateDates(r, ["createdAt", "updatedAt"]);
           const include = args.include as Dict | undefined;
           if (include?.project) {
             const project = s.projects.find((p) => p.id === r.projectId);
@@ -203,7 +203,7 @@ function model(name: keyof MockStore) {
 
       if (name === "escalations") {
         return rows.map((r) => {
-          let out = hydrateDates(r, ["deadline", "createdAt", "updatedAt"]);
+          const out = hydrateDates(r, ["deadline", "createdAt", "updatedAt"]);
           const include = args.include as Dict | undefined;
           if (include?.project) {
             const project = s.projects.find((p) => p.id === r.projectId);
@@ -329,7 +329,8 @@ function model(name: keyof MockStore) {
 
       if (name === "users") {
         return rows.map((r) => {
-          const { password: _p, ...rest } = r;
+          const { password: _password, ...rest } = r;
+          void _password;
           return args.select ? applySelect(rest, args.select as Dict) : rest;
         });
       }
@@ -341,7 +342,7 @@ function model(name: keyof MockStore) {
       const where = args.where as Dict;
       const s = store();
       const rows = s[name] as Dict[];
-      let row = rows.find((r) => {
+      const row = rows.find((r) => {
         if (where.id) return r.id === where.id;
         if (where.email) return r.email === where.email;
         return false;
