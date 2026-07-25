@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
           ? "Priority intervention — high need index from RAG + sentiment"
           : "Monitor — moderate development pressure",
     })),
-    aiNote: analyseSentiment(
+    aiNote: await analyseSentiment(
       topGaps.map((g) => `${g.district} need ${g.needIndex > 0.5 ? "urgent" : "stable"}`).join(". ")
     ),
   };

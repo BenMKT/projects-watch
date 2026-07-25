@@ -109,7 +109,28 @@ src/
 prisma/          # schema + seed
 ```
 
-AI sentiment (`lib/ai/sentiment.ts`) and geoclustering (`lib/ai/clustering.ts`) are pluggable mocks ready for real NLP/CV services.
+AI modules are **env-switched** (demo defaults need no paid APIs):
+
+| Variable | Values | Default |
+|----------|--------|---------|
+| `SENTIMENT_PROVIDER` | `mock` · `openai` · `remote` (HF/HTTP) | `mock` |
+| `CLUSTER_PROVIDER` | `grid` · `supercluster` | `grid` (local; never an LLM) |
+| `VOICE_STT_PROVIDER` | `browser` · `remote` | `browser` |
+| `VISION_PROVIDER` | `mock` · `remote` | `mock` |
+
+**Production pattern** (one OpenAI key + Supercluster):
+
+```env
+OPENAI_API_KEY=sk-...
+SENTIMENT_PROVIDER=openai
+VOICE_STT_PROVIDER=remote
+VISION_PROVIDER=remote
+CLUSTER_PROVIDER=supercluster
+BLOB_READ_WRITE_TOKEN=...
+DATA_SOURCE=prisma
+```
+
+Fallbacks: openai/remote AI → mock/browser on failure. Whisper/vision/sentiment share `OPENAI_API_KEY` unless service-specific keys are set.
 
 ## Scripts
 

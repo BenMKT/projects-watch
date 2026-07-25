@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Mic, MicOff, Camera, FileText, Send, Loader2 } from "lucide-react";
 import { isOnline, saveDraft, cachePhoto } from "@/lib/offline";
 import { encryptOfflineDraft } from "@/lib/client-crypto";
@@ -11,17 +11,52 @@ interface Props {
   onSubmitted?: () => void;
 }
 
+type SttMode = "browser" | "remote";
+type VisionMode = "mock" | "remote";
+
 export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: Props) {
   const [type, setType] = useState<"WRITTEN" | "PHOTO" | "VIDEO" | "VOICE" | "STRUCTURED">("WRITTEN");
   const [content, setContent] = useState("");
   const [milestoneId, setMilestoneId] = useState("");
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
+  const [imageDataUrl, setImageDataUrl] = useState<string | undefined>();
   const [listening, setListening] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [sttMode, setSttMode] = useState<SttMode>("browser");
+  const [sttLang, setSttLang] = useState("en-UG");
+  const [visionMode, setVisionMode] = useState<VisionMode>("mock");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const streamRef = useRef<MediaStream | null>(null);
 
-  function startVoice() {
+  useEffect(() => {
+    fetch("/api/voice/config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.provider === "remote") setSttMode("remote");
+        if (typeof d.lang === "string") setSttLang(d.lang);
+      })
+      .catch(() => undefined);
+
+    fetch("/api/vision/config")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.provider === "remote") setVisionMode("remote");
+      })
+      .catch(() => undefined);
+
+    return () => {
+      recognitionRef.current?.stop();
+      mediaRecorderRef.current?.stop();
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
+  function startBrowserVoice() {
     const SR =
       typeof window !== "undefined"
         ? window.SpeechRecognition || window.webkitSpeechRecognition
@@ -31,7 +66,7 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
       return;
     }
     const recognition = new SR();
-    recognition.lang = "en-UG";
+    recognition.lang = sttLang || "en-UG";
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -47,9 +82,92 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
     recognition.start();
     setListening(true);
     setType("VOICE");
+    setMessage("Listening (browser speech)…");
+  }
+
+  async function startRemoteVoice() {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setMessage("Microphone unavailable — falling back to browser speech.");
+      startBrowserVoice();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream;
+      chunksRef.current = [];
+      const mime = MediaRecorder.isTypeSupported("audio/webm")
+        ? "audio/webm"
+        : MediaRecorder.isTypeSupported("audio/ogg")
+          ? "audio/ogg"
+          : "";
+      const recorder = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunksRef.current.push(e.data);
+      };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        streamRef.current = null;
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || "audio/webm" });
+        chunksRef.current = [];
+        if (blob.size < 500) {
+          setMessage("Recording too short — try again.");
+          return;
+        }
+        await uploadAndTranscribe(blob);
+      };
+      recorder.start(250);
+      setListening(true);
+      setType("VOICE");
+      setMessage("Recording audio for remote transcription…");
+    } catch {
+      setMessage("Mic permission denied — falling back to browser speech.");
+      startBrowserVoice();
+    }
+  }
+
+  async function uploadAndTranscribe(blob: Blob) {
+    setTranscribing(true);
+    setMessage("Transcribing voice…");
+    try {
+      const fd = new FormData();
+      fd.append("file", blob, `voice-${Date.now()}.webm`);
+      const res = await fetch("/api/voice/transcribe", { method: "POST", body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage(
+          `${data.error || "Transcription failed"}. You can type the report or retry with browser speech.`
+        );
+        return;
+      }
+      setContent(String(data.transcript || "").trim());
+      setMessage("Transcript ready — edit if needed, then submit.");
+    } catch {
+      setMessage("Network error during transcription. Type your report or try browser speech.");
+    } finally {
+      setTranscribing(false);
+    }
+  }
+
+  function startVoice() {
+    setMessage("");
+    if (sttMode === "remote" && isOnline()) {
+      void startRemoteVoice();
+    } else {
+      if (sttMode === "remote" && !isOnline()) {
+        setMessage("Offline — using browser speech (remote STT unavailable).");
+      }
+      startBrowserVoice();
+    }
   }
 
   function stopVoice() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current = null;
+      setListening(false);
+      return;
+    }
     recognitionRef.current?.stop();
     setListening(false);
   }
@@ -57,19 +175,71 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files?.length) return;
+    const file = files[0];
+
+    // Voice audio attachment → remote STT when enabled
+    if (file.type.startsWith("audio/") && sttMode === "remote" && isOnline()) {
+      setType("VOICE");
+      await uploadAndTranscribe(file);
+      return;
+    }
+
+    // Images: upload for Blob URL / inline data URL when online (needed for remote vision)
+    if (file.type.startsWith("image/") && isOnline()) {
+      setUploadingMedia(true);
+      setMessage(
+        visionMode === "remote"
+          ? "Uploading image for vision analysis…"
+          : "Uploading evidence image…"
+      );
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await fetch("/api/evidence/media", { method: "POST", body: fd });
+        const data = await res.json();
+        if (res.ok) {
+          if (data.url) {
+            setMediaUrls((m) => [...m, data.url]);
+            setImageDataUrl(undefined);
+          } else if (data.imageDataUrl) {
+            const id = `media_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+            cachePhoto(id, data.imageDataUrl);
+            setMediaUrls((m) => [...m, id]);
+            setImageDataUrl(data.imageDataUrl);
+          }
+          setType("PHOTO");
+          setMessage(
+            visionMode === "remote"
+              ? "Image ready — caption optional; vision runs on submit."
+              : "Image attached."
+          );
+          return;
+        }
+        setMessage(data.error || "Image upload failed — caching locally.");
+      } catch {
+        setMessage("Upload failed — caching locally.");
+      } finally {
+        setUploadingMedia(false);
+      }
+    }
+
     const urls: string[] = [];
-    for (const file of Array.from(files)) {
+    for (const f of Array.from(files)) {
       const reader = new FileReader();
       const dataUrl = await new Promise<string>((resolve) => {
         reader.onload = () => resolve(String(reader.result));
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(f);
       });
       const id = `media_${Date.now()}_${Math.random().toString(36).slice(2)}`;
       cachePhoto(id, dataUrl);
       urls.push(id);
+      if (f.type.startsWith("image/") && !imageDataUrl) {
+        setImageDataUrl(dataUrl);
+      }
     }
     setMediaUrls((m) => [...m, ...urls]);
-    if (files[0].type.startsWith("video")) setType("VIDEO");
+    if (file.type.startsWith("video")) setType("VIDEO");
+    else if (file.type.startsWith("audio")) setType("VOICE");
     else setType("PHOTO");
   }
 
@@ -90,6 +260,7 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
       // GPS optional
     }
 
+    const httpMedia = mediaUrls.find((u) => u.startsWith("http"));
     const payload = {
       projectId,
       milestoneId: milestoneId || undefined,
@@ -106,6 +277,14 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
         constructionKeywords: content.toLowerCase().includes("construct")
           ? ["construction"]
           : [],
+        sttProvider: type === "VOICE" ? sttMode : undefined,
+        visionProvider: type === "PHOTO" || type === "VIDEO" ? visionMode : undefined,
+        imageUrl: httpMedia,
+        // Only send inline image when no public URL (remote vision fallback)
+        imageDataUrl:
+          !httpMedia && (type === "PHOTO" || type === "VIDEO")
+            ? imageDataUrl
+            : undefined,
       },
       isAnonymous: true,
     };
@@ -128,6 +307,7 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
         setMessage("Saved offline securely. Will sync when you reconnect.");
         setContent("");
         setMediaUrls([]);
+        setImageDataUrl(undefined);
         onSubmitted?.();
         return;
       }
@@ -147,6 +327,7 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
       );
       setContent("");
       setMediaUrls([]);
+      setImageDataUrl(undefined);
       onSubmitted?.();
     } finally {
       setLoading(false);
@@ -161,6 +342,11 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
         </h3>
         <p className="text-sm text-teal-800/70">
           Photos, video, written or voice reports. Identity stays anonymised.
+        </p>
+        <p className="mt-1 text-xs text-teal-700/80">
+          Voice: {sttMode === "remote" ? "remote STT" : "browser speech"}
+          {" · "}
+          Photos: {visionMode === "remote" ? "GPT-4o-mini vision" : "metadata heuristics"}
         </p>
       </div>
 
@@ -227,19 +413,42 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
         <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-teal-900/15 px-3 py-2 text-sm text-teal-900 hover:bg-teal-50">
           <Camera className="h-4 w-4" />
           Attach media
-          <input type="file" accept="image/*,video/*" multiple className="hidden" onChange={onFile} />
+          <input
+            type="file"
+            accept={
+              sttMode === "remote"
+                ? "image/*,video/*,audio/*"
+                : "image/*,video/*"
+            }
+            multiple={sttMode !== "remote"}
+            className="hidden"
+            onChange={onFile}
+          />
         </label>
         <button
           type="button"
           onClick={listening ? stopVoice : startVoice}
-          className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm ${
+          disabled={transcribing}
+          className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm disabled:opacity-50 ${
             listening
               ? "border-rose-500 bg-rose-50 text-rose-700"
               : "border-teal-900/15 text-teal-900"
           }`}
         >
-          {listening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-          {listening ? "Stop listening" : "Start voice report"}
+          {transcribing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : listening ? (
+            <MicOff className="h-4 w-4" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+          {transcribing
+            ? "Transcribing…"
+            : listening
+              ? sttMode === "remote"
+                ? "Stop & transcribe"
+                : "Stop listening"
+              : "Start voice report"}
         </button>
       </div>
 
@@ -249,7 +458,7 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
 
       <button
         type="submit"
-        disabled={loading || !content.trim()}
+        disabled={loading || !content.trim() || transcribing || uploadingMedia}
         className="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-teal-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-teal-900 disabled:opacity-60"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
