@@ -24,6 +24,10 @@ const reportSchema = z.object({
       durationSeconds: z.number().optional(),
       recentCapture: z.boolean().optional(),
       constructionKeywords: z.array(z.string()).optional(),
+      imageUrl: z.string().url().optional(),
+      imageDataUrl: z.string().optional(),
+      visionProvider: z.string().optional(),
+      sttProvider: z.string().optional(),
     })
     .optional(),
   isAnonymous: z.boolean().default(true),
@@ -86,14 +90,35 @@ export async function POST(req: NextRequest) {
   }
 
   const data = parsed.data;
-  const sentiment = analyseSentiment(data.content || "");
-  const activity = analyseMediaActivity(data.photoMetadata);
+  const sentiment = await analyseSentiment(data.content || "");
+
+  // Prefer explicit vision refs; else first https media URL
+  const imageUrl =
+    data.photoMetadata?.imageUrl ||
+    data.mediaUrls.find((u) => u.startsWith("http")) ||
+    undefined;
+  const activity = await analyseMediaActivity({
+    ...data.photoMetadata,
+    imageUrl,
+    imageDataUrl: data.photoMetadata?.imageDataUrl,
+  });
+
+  // Never persist large data-URL payloads in DB
+  const { imageDataUrl: _dropDataUrl, ...metaSafe } = data.photoMetadata || {};
+  void _dropDataUrl;
+  const persistedMeta = {
+    ...metaSafe,
+    ...(imageUrl ? { imageUrl } : {}),
+    visionProvider: activity.provider,
+    visionSignals: activity.signals,
+    visionSummary: activity.summary,
+  };
 
   const encryptedPayload = encryptPayload(
     JSON.stringify({
       content: data.content,
       mediaUrls: data.mediaUrls,
-      metadata: data.photoMetadata,
+      metadata: persistedMeta,
       submittedBy: user.id,
     })
   );
@@ -114,7 +139,7 @@ export async function POST(req: NextRequest) {
       mediaUrls: data.mediaUrls as Prisma.InputJsonValue,
       latitude: data.latitude,
       longitude: data.longitude,
-      photoMetadata: (data.photoMetadata as Prisma.InputJsonValue) ?? undefined,
+      photoMetadata: persistedMeta as Prisma.InputJsonValue,
       sentiment: sentiment.label,
       sentimentScore: sentiment.score,
       activityScore: activity.activityScore,
