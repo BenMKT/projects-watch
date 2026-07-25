@@ -270,5 +270,61 @@
     { "id": "ret_1", "entityType": "CitizenReport", "retentionDays": 2555, "anonymiseAfter": 365, "description": "Citizen evidence retained 7 years; reporter linkage anonymised after 1 year.", "updatedAt": "2024-06-01T00:00:00.000Z" },
     { "id": "ret_2", "entityType": "SurveyResponse", "retentionDays": 1825, "anonymiseAfter": 730, "description": "Household survey raw data restricted; anonymise household codes after 2 years.", "updatedAt": "2024-06-01T00:00:00.000Z" },
     { "id": "ret_3", "entityType": "AuditLog", "retentionDays": 3650, "anonymiseAfter": null, "description": "Immutable audit trail retained 10 years for parliamentary/audit access.", "updatedAt": "2024-06-01T00:00:00.000Z" }
+  ],
+  "chamberBriefings": [
+    {
+      "id": "brief_1",
+      "title": "PAC hearing — Jinja maternity wing stall",
+      "narrative": "Public Accounts Committee pressed the ministry on site abandonment and missing materials. Members linked citizen RED alerts to the need for an IGG referral timeline.",
+      "videoSource": "URL",
+      "videoUrl": "https://www.youtube.com/watch?v=XfkdBEreCe0",
+      "blobPath": null,
+      "mimeType": "video/youtube",
+      "fileSize": null,
+      "thumbnailUrl": null,
+      "sessionDate": "2025-03-10T09:00:00.000Z",
+      "committee": "Public Accounts Committee",
+      "district": "Jinja",
+      "published": true,
+      "authorId": "user_parliament",
+      "createdAt": "2025-03-10T16:00:00.000Z",
+      "updatedAt": "2025-03-10T16:00:00.000Z"
+    },
+    {
+      "id": "brief_2",
+      "title": "Budget debate — Kampala Northern Bypass oversight",
+      "narrative": "MPs flagged walkway delays and drainage gaps along the bypass. The chamber asked for a mid-term contractor scorecard before the next appropriation.",
+      "videoSource": "URL",
+      "videoUrl": "https://www.youtube.com/watch?v=B4zqwSZZemo",
+      "blobPath": null,
+      "mimeType": "video/youtube",
+      "fileSize": null,
+      "thumbnailUrl": null,
+      "sessionDate": "2025-02-18T10:30:00.000Z",
+      "committee": "Committee on Physical Infrastructure",
+      "district": "Kampala",
+      "published": true,
+      "authorId": "user_superadmin",
+      "createdAt": "2025-02-18T18:00:00.000Z",
+      "updatedAt": "2025-02-18T18:00:00.000Z"
+    },
+    {
+      "id": "brief_3",
+      "title": "Plenary statement — Gulu water kiosks on track",
+      "narrative": "A short plenary note praised solar pump delivery in Gulu while urging neighbouring districts to adopt the same community verification model.",
+      "videoSource": "URL",
+      "videoUrl": "https://www.youtube.com/watch?v=I2dMNA6wARc",
+      "blobPath": null,
+      "mimeType": "video/youtube",
+      "fileSize": null,
+      "thumbnailUrl": null,
+      "sessionDate": "2025-02-05T14:00:00.000Z",
+      "committee": "Plenary",
+      "district": "Gulu",
+      "published": true,
+      "authorId": "user_parliament",
+      "createdAt": "2025-02-05T17:30:00.000Z",
+      "updatedAt": "2025-02-05T17:30:00.000Z"
+    }
   ]
 }

@@ -11,6 +11,7 @@ const links = [
   { href: "/map", label: "Project Map" },
   { href: "/projects", label: "Projects" },
   { href: "/reports", label: "Reports Feed" },
+  { href: "/briefings", label: "Chamber" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/surveys", label: "Surveys" },
 ];

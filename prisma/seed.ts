@@ -18,6 +18,7 @@ async function main() {
   await prisma.contractorPerformance.deleteMany();
   await prisma.developmentScorecard.deleteMany();
   await prisma.monthlyReport.deleteMany();
+  await prisma.chamberBriefing.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.dataRetentionPolicy.deleteMany();
   await prisma.project.deleteMany();
@@ -75,7 +76,7 @@ async function main() {
     },
   });
 
-  await prisma.user.create({
+  const parliament = await prisma.user.create({
     data: {
       email: "parliament@cdw.local",
       name: "Parliamentary Oversight",
@@ -400,6 +401,50 @@ async function main() {
         entityType: "AuditLog",
         retentionDays: 3650,
         description: "Immutable audit trail retained 10 years for parliamentary/audit access.",
+      },
+    ],
+  });
+
+  await prisma.chamberBriefing.createMany({
+    data: [
+      {
+        title: "PAC hearing — Jinja maternity wing stall",
+        narrative:
+          "Public Accounts Committee pressed the ministry on site abandonment and missing materials. Members linked citizen RED alerts to the need for an IGG referral timeline.",
+        videoSource: "URL",
+        videoUrl: "https://www.youtube.com/watch?v=XfkdBEreCe0",
+        mimeType: "video/youtube",
+        sessionDate: new Date("2025-03-10T09:00:00.000Z"),
+        committee: "Public Accounts Committee",
+        district: "Jinja",
+        published: true,
+        authorId: parliament.id,
+      },
+      {
+        title: "Budget debate — Kampala Northern Bypass oversight",
+        narrative:
+          "MPs flagged walkway delays and drainage gaps along the bypass. The chamber asked for a mid-term contractor scorecard before the next appropriation.",
+        videoSource: "URL",
+        videoUrl: "https://www.youtube.com/watch?v=B4zqwSZZemo",
+        mimeType: "video/youtube",
+        sessionDate: new Date("2025-02-18T10:30:00.000Z"),
+        committee: "Committee on Physical Infrastructure",
+        district: "Kampala",
+        published: true,
+        authorId: superAdmin.id,
+      },
+      {
+        title: "Plenary statement — Gulu water kiosks on track",
+        narrative:
+          "A short plenary note praised solar pump delivery in Gulu while urging neighbouring districts to adopt the same community verification model.",
+        videoSource: "URL",
+        videoUrl: "https://www.youtube.com/watch?v=I2dMNA6wARc",
+        mimeType: "video/youtube",
+        sessionDate: new Date("2025-02-05T14:00:00.000Z"),
+        committee: "Plenary",
+        district: "Gulu",
+        published: true,
+        authorId: parliament.id,
       },
     ],
   });

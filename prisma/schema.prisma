@@ -96,6 +96,32 @@ model User {
   audits             AuditLog[]
   escalationsHandled Escalation[] @relation("EscalationHandler")
   ministryActions    MinistryResponse[]
+  chamberBriefings   ChamberBriefing[]
+}
+
+enum VideoSource {
+  URL
+  BLOB
+}
+
+model ChamberBriefing {
+  id           String      @id @default(cuid())
+  title        String
+  narrative    String
+  videoSource  VideoSource @default(URL)
+  videoUrl     String
+  blobPath     String?
+  mimeType     String?
+  fileSize     Int?
+  thumbnailUrl String?
+  sessionDate  DateTime
+  committee    String?
+  district     String?
+  published    Boolean     @default(true)
+  authorId     String
+  author       User        @relation(fields: [authorId], references: [id])
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
 model Project {

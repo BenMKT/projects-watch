@@ -91,8 +91,10 @@ MFA code (admins / officers / parliamentary): `123456`
 | `/map` | Interactive RAG map |
 | `/projects` | Project register |
 | `/reports` | Community feed |
+| `/briefings` | Chamber Briefings (parliamentary sessions) |
 | `/dashboard` | Public analytics |
 | `/admin` | Ministry console |
+| `/admin/briefings` | Publish Chamber Briefings (URL or Blob) |
 | `/officer` | Field surveys + offline |
 | `/login` | Auth |
 

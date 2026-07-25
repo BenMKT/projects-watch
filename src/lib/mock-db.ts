@@ -20,17 +20,23 @@ type MockStore = {
   scorecards: Array<Dict & { id: string }>;
   auditLogs: Array<Dict & { id: string }>;
   retentionPolicies: Array<Dict & { id: string }>;
+  chamberBriefings: Array<Dict & { id: string; authorId: string }>;
 };
 
 const globalForMock = globalThis as unknown as { __cdwMockStore?: MockStore };
 
 function cloneStore(): MockStore {
-  return JSON.parse(JSON.stringify(mockData)) as MockStore;
+  const data = JSON.parse(JSON.stringify(mockData)) as MockStore;
+  if (!Array.isArray(data.chamberBriefings)) data.chamberBriefings = [];
+  return data;
 }
 
 function store(): MockStore {
   if (!globalForMock.__cdwMockStore) {
     globalForMock.__cdwMockStore = cloneStore();
+  }
+  if (!Array.isArray(globalForMock.__cdwMockStore.chamberBriefings)) {
+    globalForMock.__cdwMockStore.chamberBriefings = cloneStore().chamberBriefings;
   }
   return globalForMock.__cdwMockStore;
 }
@@ -327,6 +333,20 @@ function model(name: keyof MockStore) {
         return rows.map((r) => hydrateDates(r, ["updatedAt"]));
       }
 
+      if (name === "chamberBriefings") {
+        return rows.map((r) => {
+          const out = hydrateDates(r, ["sessionDate", "createdAt", "updatedAt"]);
+          const include = args.include as Dict | undefined;
+          if (include?.author) {
+            const author = s.users.find((u) => u.id === r.authorId);
+            out.author = author
+              ? applySelect(author, (include.author as Dict).select as Dict | undefined)
+              : null;
+          }
+          return out;
+        });
+      }
+
       if (name === "users") {
         return rows.map((r) => {
           const { password: _password, ...rest } = r;
@@ -362,7 +382,40 @@ function model(name: keyof MockStore) {
       return rows[0] ?? null;
     },
 
-    async create() {
+    async create(args: Dict = {}) {
+      // Demo: allow in-memory Chamber Briefing publishes (URL-only).
+      if (name === "chamberBriefings") {
+        const s = store();
+        const data = (args.data || {}) as Dict;
+        const now = new Date().toISOString();
+        const row: Dict & { id: string; authorId: string } = {
+          id: `brief_${Date.now()}`,
+          title: String(data.title || ""),
+          narrative: String(data.narrative || ""),
+          videoSource: String(data.videoSource || "URL"),
+          videoUrl: String(data.videoUrl || ""),
+          blobPath: (data.blobPath as string | null) ?? null,
+          mimeType: (data.mimeType as string | null) ?? null,
+          fileSize: (data.fileSize as number | null) ?? null,
+          thumbnailUrl: (data.thumbnailUrl as string | null) ?? null,
+          sessionDate: data.sessionDate
+            ? new Date(String(data.sessionDate)).toISOString()
+            : now,
+          committee: (data.committee as string | null) ?? null,
+          district: (data.district as string | null) ?? null,
+          published: data.published !== false,
+          authorId: String(data.authorId || ""),
+          createdAt: now,
+          updatedAt: now,
+        };
+        s.chamberBriefings.unshift(row);
+        const out = hydrateDates(row, ["sessionDate", "createdAt", "updatedAt"]);
+        const author = s.users.find((u) => u.id === row.authorId);
+        out.author = author
+          ? { id: author.id, name: author.name, role: author.role }
+          : null;
+        return out;
+      }
       readOnlyDenied(`${String(name)}.create`);
     },
     async update() {
@@ -397,6 +450,7 @@ export const mockPrisma = {
   developmentScorecard: model("scorecards"),
   auditLog: model("auditLogs"),
   dataRetentionPolicy: model("retentionPolicies"),
+  chamberBriefing: model("chamberBriefings"),
   $disconnect: async () => undefined,
 };
 
