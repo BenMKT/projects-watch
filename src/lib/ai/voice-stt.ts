@@ -89,7 +89,7 @@ export function voiceSttPublicConfig() {
     provider: remoteReady ? ("remote" as const) : ("browser" as const),
     requestedProvider: provider,
     remoteConfigured: voiceSttRemoteConfigured(),
-    lang: process.env.VOICE_STT_LANG?.trim() || "en-UG",
+    lang: process.env.VOICE_STT_LANG?.trim() || "en-GB",
     browserFallback: true,
   };
 }

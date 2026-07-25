@@ -26,19 +26,24 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [sttMode, setSttMode] = useState<SttMode>("browser");
-  const [sttLang, setSttLang] = useState("en-UG");
+  const [sttLang, setSttLang] = useState("en-GB");
   const [visionMode, setVisionMode] = useState<VisionMode>("mock");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
+  const liveTranscriptRef = useRef("");
+  const speechErrorRef = useRef<string | null>(null);
 
   useEffect(() => {
     fetch("/api/voice/config")
       .then((r) => r.json())
       .then((d) => {
         if (d.provider === "remote") setSttMode("remote");
-        if (typeof d.lang === "string") setSttLang(d.lang);
+        if (typeof d.lang === "string") {
+          // Map unsupported Uganda tag to a widely available English locale
+          setSttLang(d.lang === "en-UG" ? "en-GB" : d.lang);
+        }
       })
       .catch(() => undefined);
 
@@ -56,17 +61,42 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
     };
   }, []);
 
+  function speechErrorMessage(code: string): string {
+    switch (code) {
+      case "not-allowed":
+      case "service-not-allowed":
+        return "Microphone permission denied. Allow mic access and try again.";
+      case "no-speech":
+        return "No speech detected. Speak clearly, then press Stop.";
+      case "audio-capture":
+        return "No microphone found. Plug in a mic or type your report.";
+      case "network":
+        return "Speech service network error. Check connection or type your report.";
+      case "language-not-supported":
+        return `Language ${sttLang} is not supported here. Set VOICE_STT_LANG=en-GB and retry.`;
+      case "aborted":
+        return "";
+      default:
+        return `Voice error (${code}). Try Chrome/Edge or type your report.`;
+    }
+  }
+
   function startBrowserVoice() {
     const SR =
       typeof window !== "undefined"
         ? window.SpeechRecognition || window.webkitSpeechRecognition
         : null;
     if (!SR) {
-      setMessage("Voice input not supported in this browser. Type your report instead.");
+      setMessage("Voice input not supported in this browser. Use Chrome/Edge, or type your report.");
       return;
     }
+    liveTranscriptRef.current = "";
+    speechErrorRef.current = null;
+
     const recognition = new SR();
-    recognition.lang = sttLang || "en-UG";
+    // Prefer configured lang; fall back to en-GB (en-UG often yields empty results)
+    const lang = sttLang && sttLang !== "en-UG" ? sttLang : "en-GB";
+    recognition.lang = lang;
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -74,15 +104,43 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
       for (let i = 0; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
       }
+      liveTranscriptRef.current = transcript;
       setContent(transcript);
+      if (transcript.trim()) {
+        setMessage("Listening… transcript updating.");
+      }
     };
-    recognition.onerror = () => setListening(false);
-    recognition.onend = () => setListening(false);
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      speechErrorRef.current = event.error || "unknown";
+      const msg = speechErrorMessage(event.error || "unknown");
+      if (msg) setMessage(msg);
+      setListening(false);
+    };
+    recognition.onend = () => {
+      setListening(false);
+      const text = liveTranscriptRef.current.trim();
+      if (text) {
+        setContent(text);
+        setMessage("Transcript ready — edit if needed, then submit.");
+        return;
+      }
+      if (speechErrorRef.current && speechErrorRef.current !== "aborted") {
+        return; // error message already set
+      }
+      setMessage(
+        "No speech detected. Use Chrome/Edge, allow the mic, speak for a few seconds, then Stop. Or type your report."
+      );
+    };
     recognitionRef.current = recognition;
-    recognition.start();
-    setListening(true);
-    setType("VOICE");
-    setMessage("Listening (browser speech)…");
+    try {
+      recognition.start();
+      setListening(true);
+      setType("VOICE");
+      setMessage(`Listening (browser speech, ${lang})…`);
+    } catch {
+      setMessage("Could not start voice recognition. Refresh and try again, or type your report.");
+      setListening(false);
+    }
   }
 
   async function startRemoteVoice() {
@@ -168,8 +226,8 @@ export function EvidenceReportForm({ projectId, milestones = [], onSubmitted }: 
       setListening(false);
       return;
     }
+    // stop() triggers onend, which finalizes transcript / empty message
     recognitionRef.current?.stop();
-    setListening(false);
   }
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
