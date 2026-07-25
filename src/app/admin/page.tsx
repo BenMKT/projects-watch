@@ -32,22 +32,31 @@ export default function AdminHomePage() {
       </p>
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          ["/admin/projects", "Onboard / manage projects"],
-          ["/admin/rag", "Review & publish RAG"],
-          ["/admin/surveys", "Approve surveys"],
-          ["/admin/escalations", "Escalation desk"],
-          ["/admin/volunteers", "Manage volunteers"],
-          ["/admin/audit", "Audit & retention"],
-        ].map(([href, label]) => (
-          <Link
-            key={href}
-            href={href}
-            className="rounded-xl border border-teal-900/10 bg-white px-4 py-4 text-sm font-medium text-teal-950 hover:border-teal-700"
-          >
-            {label}
-          </Link>
-        ))}
+        {(
+          [
+            ["/admin/projects", "Onboard / manage projects", true],
+            ["/admin/rag", "Review & publish RAG", true],
+            [
+              "/admin/briefings",
+              "Chamber Briefings",
+              session?.user?.role === "SUPER_ADMIN" || session?.user?.role === "PARLIAMENTARY",
+            ],
+            ["/admin/surveys", "Approve surveys", true],
+            ["/admin/escalations", "Escalation desk", true],
+            ["/admin/volunteers", "Manage volunteers", true],
+            ["/admin/audit", "Audit & retention", true],
+          ] as Array<[string, string, boolean]>
+        )
+          .filter(([, , show]) => show)
+          .map(([href, label]) => (
+            <Link
+              key={href}
+              href={href}
+              className="rounded-xl border border-teal-900/10 bg-white px-4 py-4 text-sm font-medium text-teal-950 hover:border-teal-700"
+            >
+              {label}
+            </Link>
+          ))}
       </div>
 
       {analytics && (

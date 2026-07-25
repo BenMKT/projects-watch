@@ -17,7 +17,8 @@ export type Permission =
   | "dashboard:public"
   | "escalation:manage"
   | "audit:view"
-  | "contractor:view_performance";
+  | "contractor:view_performance"
+  | "briefing:publish";
 
 const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   SUPER_ADMIN: [
@@ -38,6 +39,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "escalation:manage",
     "audit:view",
     "contractor:view_performance",
+    "briefing:publish",
   ],
   DISTRICT_ADMIN: [
     "project:view",
@@ -76,6 +78,7 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "audit:view",
     "contractor:view_performance",
     "escalation:manage",
+    "briefing:publish",
   ],
 };
 
